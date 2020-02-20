@@ -4,4 +4,13 @@
 .Ruserdata
 
 *.Rproj
+*.log
+*.txt
+*.csv
 
+objects/
+Sample_inputs/
+
+create_annotation_file_forLF.R
+
+MSStatsTMT_make-annotation_Version2.R
