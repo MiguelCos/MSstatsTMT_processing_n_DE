@@ -77,3 +77,73 @@ if (file.exists(here::here("objects/summarized_data.Rda")) == FALSE){
       load(here::here("objects/summarized_data.Rda"))
 }
 
+## Exploratory plots ----
+
+## Profile plots ----
+
+dataProcessPlotsTMT(data.peptide = tmt_mstsformat,
+                    data.summarization = tmt_procs,
+                    type = "ProfilePlot",
+                    address = FALSE,
+                    originalPlot = TRUE,
+                    summaryPlot = FALSE,
+                    which.Protein = "O00762ups",
+                    width = 21,
+                    height = 5)
+
+## Quality control plots ----  
+
+dataProcessPlotsTMT(data.peptide = tmt_mstsformat,
+                    data.summarization = tmt_procs,
+                    type = "QCPlot",
+                    address = FALSE,
+                    originalPlot = FALSE,
+                    summaryPlot = TRUE,
+                    which.Protein = "O00762ups",
+                    width = 21,
+                    height = 5)
+
+## Differential expression analysis ----
+
+## Creating a contrast matrix ----
+
+comparison1<-matrix(c(-1,1,0,0),nrow=1)
+comparison2<-matrix(c(-1,0,1,0),nrow=1)
+comparison3<-matrix(c(-1,0,0,1),nrow=1)
+comparison4<-matrix(c(0,-1,1,0),nrow=1)
+comparison5<-matrix(c(0,-1,0,1),nrow=1)
+comparison6<-matrix(c(0,0,-1,1),nrow=1)
+
+
+comparison_all <- rbind(comparison1, 
+                        comparison2, comparison3, 
+                        comparison4, comparison5, comparison6)
+
+colnames(comparison_all)<- c("0.125", "0.5", "0.667", "1")
+
+row.names(comparison_all)<-c("0.5-0.125","0.667-0.125","1-0.125",
+                             "0.667-0.5","1-0.5","1-0.667")
+
+## Executing `groupComparisonTMT()` ----
+
+if (file.exists(here::here("Data/TMT/groupCompar.Rds")) == FALSE){
+   diffexpr <- groupComparisonTMT(data = tmt_procs,
+                                  contrast.matrix = comparison_all)
+   
+   saveRDS(object = diffexpr, file = here::here("Data/TMT/groupCompar.Rds"))
+} else {
+   diffexpr <- readRDS(here::here("Data/TMT/groupCompar.Rds"))
+   
+## Volcano plots (MSstatsTMT) ----
+   
+groupComparisonPlots(data = diffexpr,
+                        type = "VolcanoPlot",
+                        address = FALSE,
+                        which.Comparison = "0.5-0.125",
+                        ProteinName = FALSE)
+}
+
+
+
+
+
